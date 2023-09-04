@@ -2,9 +2,13 @@
 
 ## TODO
 
-[ ] Draw images for both eye in correct positions
+[x] Draw images for both eye in correct positions
 
-[ ] Animate images to move inwards and outwards
+[x] Animate images to move inwards and outwards
+
+[ ] Script to publish a build publicly
+
+[ ] Add optional small vertical movement
 
 [ ] Support different animations
 
