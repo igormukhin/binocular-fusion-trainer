@@ -6,6 +6,8 @@
 
 [x] Animate images to move inwards and outwards
 
+[x] Exercise with small jumps
+
 [ ] Script to publish a build publicly
 
 [ ] Add optional small vertical movement

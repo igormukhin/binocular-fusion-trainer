@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from 'vue'
-import Two from 'two.js'
-import anime from 'animejs/lib/anime.es.js'
+import {onBeforeUnmount, onMounted, ref} from 'vue';
+import Two from 'two.js';
+import anime from 'animejs/lib/anime.es.js';
 import {Shape} from "two.js/src/shape";
+import {randomItem, randomSign} from "./support/random.ts";
 
 const stage = ref(null);
 const two = new Two({ fitted: true });
@@ -36,6 +37,18 @@ function resetEyeImagePositions() {
   rightEyePosition.position.set(two.width / 2 + (eyeGap / 2), two.height / 2);
 }
 
+function animateImageRotation() {
+  anime({
+    targets: [leftEyeImage, rightEyeImage],
+    rotation: Math.PI * 2,
+    duration: 20000,
+    easing: 'linear',
+    autoplay: true,
+    loop: true,
+    update: () => two.update(),
+  });
+}
+
 function convergenceMassageAnimation() {
   const duration = 20000;
   const moveOut = 20;
@@ -58,17 +71,24 @@ function convergenceMassageAnimation() {
 
   animateEyeMovement(leftEyeImage, -1);
   animateEyeMovement(rightEyeImage, 1);
+}
 
-  // animate image rotation
+function randomJumpsAnimation() {
+  const jumpDistance = 10;
+  const duration = 5000;
+
   anime({
-    targets: [leftEyeImage, rightEyeImage],
-    rotation: Math.PI * 2,
-    duration: duration,
-    easing: 'linear',
+    targets: randomItem([leftEyeImage, rightEyeImage]).position,
+    keyframes: [
+      { x: 0, duration: duration / 4 },
+      { x: jumpDistance * randomSign(), duration: duration / 2 },
+      { x: 0, duration: duration / 4 },
+    ],
+    easing: 'steps(1)',
     autoplay: true,
-    loop: true,
     update: () => two.update(),
-  });
+    complete: () => randomJumpsAnimation(),
+  })
 }
 
 function createSceneImages() {
@@ -84,9 +104,11 @@ onMounted(() => {
   createSceneImages();
   resetEyeImagePositions();
   two.update();
+  animateImageRotation();
 
-  convergenceMassageAnimation();
-})
+  //convergenceMassageAnimation();
+  randomJumpsAnimation();
+});
 
 onBeforeUnmount(() => {
   two.clear();
