@@ -5,12 +5,35 @@ import anime from 'animejs/lib/anime.es.js';
 import {Shape} from "two.js/src/shape";
 import {randomItem, randomSign} from "./support/random.ts";
 
+interface Exercise {
+  name: string;
+  animation: () => Controllable;
+}
+
+interface Controllable {
+  pause: () => void;
+}
+
+const exercises: Exercise[] = [
+  {
+    name: 'Convergence Massage',
+    animation: convergenceMassageAnimation,
+  },
+  {
+    name: 'Random Jumps',
+    animation: randomJumpsAnimation,
+  },
+];
+
 const stage = ref(null);
 const two = new Two({ fitted: true });
 let leftEyePosition: Shape;
 let leftEyeImage: Shape;
 let rightEyePosition: Shape;
 let rightEyeImage: Shape;
+
+const selectedExercise = ref(exercises[0]);
+let currentAnimation: any;
 
 function makeEyeImage() {
   const radius = 32;
@@ -49,12 +72,12 @@ function animateImageRotation() {
   });
 }
 
-function convergenceMassageAnimation() {
+function convergenceMassageAnimation(): Controllable {
   const duration = 20000;
   const moveOut = 20;
 
   function animateEyeMovement(image: Shape, direction: number) {
-    anime({
+    return anime({
       targets: image.position,
       keyframes: [
         { x: moveOut * direction, duration: duration / 4 },
@@ -69,26 +92,45 @@ function convergenceMassageAnimation() {
     });
   }
 
-  animateEyeMovement(leftEyeImage, -1);
-  animateEyeMovement(rightEyeImage, 1);
+  const left = animateEyeMovement(leftEyeImage, -1);
+  const right = animateEyeMovement(rightEyeImage, 1);
+
+  return {
+    pause: () => {
+      left.pause();
+      right.pause();
+    }
+  }
 }
 
-function randomJumpsAnimation() {
+function randomJumpsAnimation(): Controllable {
   const jumpDistance = 10;
   const duration = 5000;
 
-  anime({
-    targets: randomItem([leftEyeImage, rightEyeImage]).position,
-    keyframes: [
-      { x: 0, duration: duration / 4 },
-      { x: jumpDistance * randomSign(), duration: duration / 2 },
-      { x: 0, duration: duration / 4 },
-    ],
-    easing: 'steps(1)',
-    autoplay: true,
-    update: () => two.update(),
-    complete: () => randomJumpsAnimation(),
-  })
+  let animation = animate();
+
+  function animate() {
+    return anime({
+      targets: randomItem([leftEyeImage, rightEyeImage]).position,
+      keyframes: [
+        { x: 0, duration: duration / 4 },
+        { x: jumpDistance * randomSign(), duration: duration / 2 },
+        { x: 0, duration: duration / 4 },
+      ],
+      easing: 'steps(1)',
+      autoplay: true,
+      update: () => two.update(),
+      complete: () => {
+        animation = animate();
+      }
+    })
+  }
+
+  return {
+    pause: () => {
+      animation.pause();
+    }
+  }
 }
 
 function createSceneImages() {
@@ -105,14 +147,20 @@ onMounted(() => {
   resetEyeImagePositions();
   two.update();
   animateImageRotation();
-
-  //convergenceMassageAnimation();
-  randomJumpsAnimation();
+  applySettings();
 });
 
 onBeforeUnmount(() => {
   two.clear();
 });
+
+function applySettings() {
+  if (currentAnimation) {
+    currentAnimation.pause();
+  }
+
+  currentAnimation = selectedExercise.value.animation();
+}
 
 </script>
 
@@ -121,6 +169,15 @@ onBeforeUnmount(() => {
     <div ref="stage" class="stage"></div>
     <div class="control_panel">
       <div class="title">Binocular Fusion Trainer</div>
+
+      <div>
+        <select v-model="selectedExercise">
+          <option v-for="exercise in exercises" :key="exercise.name" :value="exercise">{{ exercise.name }}</option>
+        </select>
+      </div>
+      <div>
+        <button @click="applySettings">Apply</button>
+      </div>
     </div>
   </div>
 </template>

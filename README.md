@@ -8,6 +8,8 @@
 
 [x] Exercise with small jumps
 
+[x] Add exercise selection
+
 [ ] Script to publish a build publicly
 
 [ ] Add optional small vertical movement
