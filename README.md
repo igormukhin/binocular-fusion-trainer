@@ -10,7 +10,9 @@
 
 [x] Add exercise selection
 
-[ ] Add different eye images (cross) with selection
+[x] Enable having different eye images
+
+[ ] Add different eye images (cross)
 
 [ ] Script to publish a build publicly
 
