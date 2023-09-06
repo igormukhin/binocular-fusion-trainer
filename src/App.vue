@@ -5,6 +5,50 @@ import anime from 'animejs/lib/anime.es.js';
 import {Shape} from "two.js/src/shape";
 import {randomItem, randomSign} from "./support/random.ts";
 
+enum Side {
+  Left,
+  Right,
+}
+
+type SidedShapes =  {
+  [key in Side]: Shape;
+}
+
+interface EyeImageFactory {
+  name: string;
+  make: () => SidedShapes;
+}
+
+const eyeImageFactories: EyeImageFactory[] = [
+  {
+    name: "Circle",
+    make: () => {
+      function makeEyeImage() {
+        const radius = 32;
+
+        const circle = two.makeCircle(0, 0, radius);
+        circle.stroke = 'black';
+
+        const hline = two.makeLine(-radius/2, 0, radius/2, 0)
+        hline.stroke = '#44ff44';
+
+        const vline = two.makeLine(0, -radius/2, 0, radius/2)
+        vline.stroke = '#ff4444';
+
+        const group = two.makeGroup(circle, hline, vline);
+        group.linewidth = 2;
+
+        return group;
+      }
+
+      return {
+        [Side.Left]: makeEyeImage(),
+        [Side.Right]: makeEyeImage(),
+      }
+    }
+  }
+]
+
 interface Exercise {
   name: string;
   animation: () => Controllable;
@@ -27,42 +71,22 @@ const exercises: Exercise[] = [
 
 const stage = ref(null);
 const two = new Two({ fitted: true });
-let leftEyePosition: Shape;
-let leftEyeImage: Shape;
-let rightEyePosition: Shape;
-let rightEyeImage: Shape;
+let eyeImages: SidedShapes;
+let eyeImagePlaceholders: SidedShapes;
 
 const selectedExercise = ref(exercises[0]);
 let currentAnimation: any;
 
-function makeEyeImage() {
-  const radius = 32;
-
-  const circle = two.makeCircle(0, 0, radius);
-  circle.stroke = 'black';
-
-  const hline = two.makeLine(-radius/2, 0, radius/2, 0)
-  hline.stroke = '#44ff44';
-
-  const vline = two.makeLine(0, -radius/2, 0, radius/2)
-  vline.stroke = '#ff4444';
-
-  const group = two.makeGroup(circle, hline, vline);
-  group.linewidth = 2;
-
-  return group;
-}
-
 function resetEyeImagePositions() {
   const eyeGap = 200;
 
-  leftEyePosition.position.set(two.width / 2 - (eyeGap / 2), two.height / 2);
-  rightEyePosition.position.set(two.width / 2 + (eyeGap / 2), two.height / 2);
+  eyeImagePlaceholders[Side.Left].position.set(two.width / 2 - (eyeGap / 2), two.height / 2);
+  eyeImagePlaceholders[Side.Right].position.set(two.width / 2 + (eyeGap / 2), two.height / 2);
 }
 
 function animateImageRotation() {
   anime({
-    targets: [leftEyeImage, rightEyeImage],
+    targets: Object.values(eyeImages),
     rotation: Math.PI * 2,
     duration: 20000,
     easing: 'linear',
@@ -92,8 +116,8 @@ function convergenceMassageAnimation(): Controllable {
     });
   }
 
-  const left = animateEyeMovement(leftEyeImage, -1);
-  const right = animateEyeMovement(rightEyeImage, 1);
+  const left = animateEyeMovement(eyeImages[Side.Left], -1);
+  const right = animateEyeMovement(eyeImages[Side.Right], 1);
 
   return {
     pause: () => {
@@ -111,7 +135,7 @@ function randomJumpsAnimation(): Controllable {
 
   function animate() {
     return anime({
-      targets: randomItem([leftEyeImage, rightEyeImage]).position,
+      targets: randomItem(Object.values(eyeImages)).position,
       keyframes: [
         { x: 0, duration: duration / 4 },
         { x: jumpDistance * randomSign(), duration: duration / 2 },
@@ -134,11 +158,12 @@ function randomJumpsAnimation(): Controllable {
 }
 
 function createSceneImages() {
-  leftEyeImage = makeEyeImage();
-  leftEyePosition = two.makeGroup(leftEyeImage);
+  eyeImages = eyeImageFactories[0].make();
 
-  rightEyeImage = makeEyeImage();
-  rightEyePosition = two.makeGroup(rightEyeImage);
+  eyeImagePlaceholders = {
+    [Side.Left]: two.makeGroup(eyeImages[Side.Left]),
+    [Side.Right]: two.makeGroup(eyeImages[Side.Right]),
+  }
 }
 
 onMounted(() => {

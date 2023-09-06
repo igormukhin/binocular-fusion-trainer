@@ -10,6 +10,8 @@
 
 [x] Add exercise selection
 
+[ ] Add different eye images (cross) with selection
+
 [ ] Script to publish a build publicly
 
 [ ] Add optional small vertical movement
