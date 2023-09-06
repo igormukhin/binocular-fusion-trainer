@@ -4,15 +4,27 @@ import anime from "animejs/lib/anime.es.js";
 import {randomItem, randomSign} from "../support/Random.ts";
 
 export const exerciseProviders: ExerciseProvider[] = [
-    {
-        name: 'Convergence Massage',
-        animate: convergenceMassageAnimation,
-    },
-    {
-        name: 'Random Jumps',
-        animate: randomJumpsAnimation,
-    },
+  {
+    name: 'No movement',
+    animate: noMovement,
+  },
+  {
+    name: 'Convergence Massage',
+    animate: convergenceMassageAnimation,
+  },
+  {
+    name: 'Random Jumps',
+    animate: randomJumpsAnimation,
+  },
 ]
+
+function noMovement(_: SidedShapes, updateCallback: () => void): Controllable {
+  updateCallback();
+  return {
+    pause: () => {
+    }
+  }
+}
 
 function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
   const duration = 20000;
@@ -22,10 +34,10 @@ function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () 
     return anime({
       targets: image.position,
       keyframes: [
-        { x: moveOut * direction, duration: duration / 4 },
-        { x: 0, duration: duration / 4 },
-        { x: moveOut * -direction, duration: duration / 4 },
-        { x: 0, duration: duration / 4 },
+        {x: moveOut * direction, duration: duration / 4},
+        {x: 0, duration: duration / 4},
+        {x: moveOut * -direction, duration: duration / 4},
+        {x: 0, duration: duration / 4},
       ],
       easing: 'linear',
       autoplay: true,
@@ -55,9 +67,9 @@ function randomJumpsAnimation(eyeImages: SidedShapes, updateCallback: () => void
     return anime({
       targets: randomItem(Object.values(eyeImages)).position,
       keyframes: [
-        { x: 0, duration: duration / 4 },
-        { x: jumpDistance * randomSign(), duration: duration / 2 },
-        { x: 0, duration: duration / 4 },
+        {x: 0, duration: duration / 4},
+        {x: jumpDistance * randomSign(), duration: duration / 2},
+        {x: 0, duration: duration / 4},
       ],
       easing: 'steps(1)',
       autoplay: true,

@@ -13,7 +13,7 @@ const selectedEyeImageFactory = ref(eyeImageFactories[0]);
 let eyeImages: SidedShapes;
 let eyeImagePlaceholders: SidedShapes;
 
-const shouldAnimateEyeImages = ref(true);
+const shouldAnimateEyeImages = ref(false);
 let currentEyeImageAnimation: Controllable;
 
 const selectedExercise = ref(exerciseProviders[0]);
