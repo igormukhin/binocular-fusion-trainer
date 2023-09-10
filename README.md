@@ -20,6 +20,10 @@ Latest version available at https://igormukhin.github.io/binocular-fusion-traine
 
 [x] Script to publish the website publicly
 
+[x] Configure sensible defaults
+
+[x] Draw central line (configurable)
+
 [ ] Add option to enable movement only for one eye
 
 [ ] Add optional small vertical movement

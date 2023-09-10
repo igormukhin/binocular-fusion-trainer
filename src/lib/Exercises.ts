@@ -5,16 +5,16 @@ import {randomItem, randomSign} from "../support/Random.ts";
 
 export const exerciseProviders: ExerciseProvider[] = [
   {
-    name: 'No movement',
-    animate: noMovement,
-  },
-  {
     name: 'Convergence Massage',
     animate: convergenceMassageAnimation,
   },
   {
     name: 'Random Jumps',
     animate: randomJumpsAnimation,
+  },
+  {
+    name: 'No movement',
+    animate: noMovement,
   },
 ]
 
