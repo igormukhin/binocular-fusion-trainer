@@ -14,10 +14,12 @@
 
 [x] Add different eye images (cross)
 
+[x] Add semi-disconnected eye images (brackets)
+
+[x] Script to publish a build publicly
+
 [ ] Add 3D mode for red-cyan glasses (eyes in the same initial position, red-cyan colors)
 
 [ ] Add randomness to jump movement exercise
-
-[ ] Script to publish a build publicly
 
 [ ] Add optional small vertical movement
