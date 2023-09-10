@@ -1,5 +1,7 @@
 # Binocular Fusion Trainer
 
+Latest version available at https://igormukhin.github.io/binocular-fusion-trainer/
+
 ## TODO
 
 [x] Draw images for both eye in correct positions
@@ -16,10 +18,10 @@
 
 [x] Add semi-disconnected eye images (brackets)
 
-[x] Script to publish a build publicly
+[x] Script to publish the website publicly
 
-[ ] Add 3D mode for red-cyan glasses (eyes in the same initial position, red-cyan colors)
-
-[ ] Add randomness to jump movement exercise
+[ ] Add option to enable movement only for one eye
 
 [ ] Add optional small vertical movement
+
+[ ] Add 3D mode for red-cyan glasses (eyes in the same initial position, red-cyan colors)
