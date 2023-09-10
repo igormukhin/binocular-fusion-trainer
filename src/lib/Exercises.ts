@@ -27,17 +27,18 @@ function noMovement(_: SidedShapes, updateCallback: () => void): Controllable {
 }
 
 function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
-  const duration = 20000;
-  const moveOut = 20;
+  const speed = 250;
+  const moveIn = 40;
+  const moveOut = 10;
 
   function animateEyeMovement(image: Shape, direction: number) {
     return anime({
       targets: image.position,
       keyframes: [
-        {x: moveOut * direction, duration: duration / 4},
-        {x: 0, duration: duration / 4},
-        {x: moveOut * -direction, duration: duration / 4},
-        {x: 0, duration: duration / 4},
+        {x: moveOut * direction, duration: speed * moveOut},
+        {x: 0, duration: speed * moveOut},
+        {x: moveIn * -direction, duration: speed * moveIn},
+        {x: 0, duration: speed * moveIn},
       ],
       easing: 'linear',
       autoplay: true,
@@ -58,12 +59,14 @@ function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () 
 }
 
 function randomJumpsAnimation(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
-  const jumpDistance = 10;
+  const minJumpDistance = 4;
+  const maxJumpDistance = 20;
   const duration = 5000;
 
   let animation = animate();
 
   function animate() {
+    const jumpDistance = Math.floor(Math.random() * (maxJumpDistance - minJumpDistance + 1)) + minJumpDistance;
     return anime({
       targets: randomItem(Object.values(eyeImages)).position,
       keyframes: [

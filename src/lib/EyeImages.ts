@@ -7,6 +7,10 @@ export const eyeImageFactories: EyeImageProvider[] = [
     make: makeCircles
   },
   {
+    name: "Semi-Disconnected Brackets",
+    make: makeSemiDisconnectedBrackets,
+  },
+  {
     name: "Disconnected Cross",
     make: makeDisconnectedCross
   }
@@ -15,19 +19,19 @@ export const eyeImageFactories: EyeImageProvider[] = [
 function makeCircles(two: Two): SidedShapes {
   function makeEyeImage() {
     const radius = 32;
+    const linewidth = 3;
 
     const circle = two.makeCircle(0, 0, radius);
     circle.stroke = 'black';
 
     const hline = two.makeLine(-radius / 2, 0, radius / 2, 0)
-    hline.stroke = '#44ff44';
-    hline.stroke = '#44ff44';
+    hline.stroke = '#0088ff';
 
     const vline = two.makeLine(0, -radius / 2, 0, radius / 2)
-    vline.stroke = '#ff4444';
+    vline.stroke = '#ff8800';
 
     const group = two.makeGroup(circle, hline, vline);
-    group.linewidth = 2;
+    group.linewidth = linewidth;
 
     return group;
   }
@@ -35,6 +39,34 @@ function makeCircles(two: Two): SidedShapes {
   return {
     [Side.Left]: makeEyeImage(),
     [Side.Right]: makeEyeImage(),
+  }
+}
+
+function makeSemiDisconnectedBrackets(two: Two): SidedShapes {
+  function makeEyeImage(side: Side) {
+    const size = 64;
+    const innerCircleRadius = 8;
+    const linewidth = 3;
+
+    const circle1 = two.makeCircle(0, 0, innerCircleRadius);
+    const circle2 = two.makeCircle(0, 0, innerCircleRadius * 2);
+    circle2.noFill()
+
+    const k = side === Side.Left ? -1 : 1;
+    const path = two.makePath(0, -size/2, k*size/2, -size/2, k*size/2, size/2, 0, size/2);
+    path.closed = false;
+    path.noFill();
+
+    const group = two.makeGroup(circle1, circle2, path);
+    circle2.stroke = 'black';
+    group.linewidth = linewidth;
+
+    return group;
+  }
+
+  return {
+    [Side.Left]: makeEyeImage(Side.Left),
+    [Side.Right]: makeEyeImage(Side.Right),
   }
 }
 
