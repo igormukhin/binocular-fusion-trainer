@@ -48,7 +48,7 @@ function applyEyeImages() {
 }
 
 function applyEyeImagePositions() {
-  const eyeGap = 240;
+  const eyeGap = 320;
 
   if (eyeImagePlaceholders) {
     Object.values(eyeImagePlaceholders).forEach(eyeImagePlaceholder => eyeImagePlaceholder.remove());

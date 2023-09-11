@@ -24,6 +24,10 @@ Latest version available at https://igormukhin.github.io/binocular-fusion-traine
 
 [x] Draw central line (configurable)
 
+[ ] Make eye distance configurable
+
+[ ] Automatically save settings in browser's local storage
+
 [ ] Add option to enable movement only for one eye
 
 [ ] Add optional small vertical movement
