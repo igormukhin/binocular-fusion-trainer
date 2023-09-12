@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import Two from 'two.js';
 import anime from 'animejs/lib/anime.es.js';
 import {Controllable, Side, SidedShapes} from "./lib/Common.ts";
 import {eyeImageFactories} from "./lib/EyeImages.ts";
 import {exerciseProviders} from "./lib/Exercises.ts";
 import {Shape} from "two.js/src/shape";
+import {loadSettings, persistSettings, Settings} from "./lib/Settings.ts";
 
 const stage = ref(null);
 const two = new Two({ fitted: true });
@@ -13,14 +14,18 @@ const two = new Two({ fitted: true });
 const shouldDrawCentralGuide = ref(true);
 let sceneBackground: Shape;
 
-const selectedEyeImageFactory = ref(eyeImageFactories[0]);
+const eyeGap = ref(320);
+
+const eyeImageFactoryName = ref(eyeImageFactories[0].name);
+const eyeImageFactory = computed(() => eyeImageFactories.find(factory => factory.name === eyeImageFactoryName.value)!!);
 let eyeImages: SidedShapes;
 let eyeImagePlaceholders: SidedShapes;
 
 const shouldAnimateEyeImages = ref(true);
 let currentEyeImageAnimation: Controllable;
 
-const selectedExercise = ref(exerciseProviders[0]);
+const exerciseName = ref(exerciseProviders[0].name);
+const exercise = computed(() => exerciseProviders.find(exercise => exercise.name === exerciseName.value)!!);
 let currentExerciseAnimation: Controllable;
 
 function applySceneBackground() {
@@ -44,12 +49,10 @@ function applyEyeImages() {
     Object.values(eyeImages).forEach(eyeImage => eyeImage.remove());
   }
 
-  eyeImages = selectedEyeImageFactory.value.make(two);
+  eyeImages = eyeImageFactory.value.make(two);
 }
 
 function applyEyeImagePositions() {
-  const eyeGap = 320;
-
   if (eyeImagePlaceholders) {
     Object.values(eyeImagePlaceholders).forEach(eyeImagePlaceholder => eyeImagePlaceholder.remove());
   }
@@ -59,8 +62,8 @@ function applyEyeImagePositions() {
     [Side.Right]: two.makeGroup(eyeImages[Side.Right]),
   }
 
-  eyeImagePlaceholders[Side.Left].position.set(two.width / 2 - (eyeGap / 2), two.height / 2);
-  eyeImagePlaceholders[Side.Right].position.set(two.width / 2 + (eyeGap / 2), two.height / 2);
+  eyeImagePlaceholders[Side.Left].position.set(two.width / 2 - (eyeGap.value / 2), two.height / 2);
+  eyeImagePlaceholders[Side.Right].position.set(two.width / 2 + (eyeGap.value / 2), two.height / 2);
 }
 
 function applyEyeImageAnimation() {
@@ -86,7 +89,7 @@ function applyExerciseAnimation() {
     currentExerciseAnimation.pause();
   }
 
-  currentExerciseAnimation = selectedExercise.value.animate(eyeImages, () => two.update());
+  currentExerciseAnimation = exercise.value.animate(eyeImages, () => two.update());
 }
 
 function applySettings() {
@@ -95,9 +98,49 @@ function applySettings() {
   applyEyeImagePositions();
   applyEyeImageAnimation();
   applyExerciseAnimation();
+  persistSettings(snapshotSettings());
+}
+
+function snapshotSettings() {
+  return {
+    shouldDrawCentralGuide: shouldDrawCentralGuide.value,
+    eyeGap: eyeGap.value,
+    eyeImageFactoryName: eyeImageFactoryName.value,
+    shouldAnimateEyeImages: shouldAnimateEyeImages.value,
+    exerciseName: exerciseName.value,
+  };
+}
+
+function restoreSettings(settings: Settings | null) {
+  if (settings == null) {
+    return;
+  }
+
+  if (settings.shouldDrawCentralGuide != null) {
+    shouldDrawCentralGuide.value = settings.shouldDrawCentralGuide;
+  }
+
+  if (settings.eyeGap != null) {
+    eyeGap.value = settings.eyeGap;
+  }
+
+  if (settings.eyeImageFactoryName != null
+      && eyeImageFactories.find(factory => factory.name === settings.eyeImageFactoryName) != null) {
+    eyeImageFactoryName.value = settings.eyeImageFactoryName;
+  }
+
+  if (settings.shouldAnimateEyeImages != null) {
+    shouldAnimateEyeImages.value = settings.shouldAnimateEyeImages;
+  }
+
+  if (settings.exerciseName != null
+      && exerciseProviders.find(exercise => exercise.name === settings.exerciseName) != null) {
+    exerciseName.value = settings.exerciseName;
+  }
 }
 
 onMounted(() => {
+  restoreSettings(loadSettings())
   two.appendTo(stage.value!!);
   applySettings();
 });
@@ -120,9 +163,14 @@ onBeforeUnmount(() => {
         <label for="centralGuide" class="checkbox">Central guide</label>
       </div>
       <div class="row">
+        <label for="eyeGap">Eye gap:</label>
+        <input id="eyeGap" v-model="eyeGap" @change="applySettings" type="range" min="160" max="400" step="10" />
+        <span>{{ eyeGap }}</span>
+      </div>
+      <div class="row">
         <label for="eyeImage">Image:</label>
-        <select id="eyeImage" v-model="selectedEyeImageFactory" @change="applySettings">
-          <option v-for="factory in eyeImageFactories" :key="factory.name" :value="factory">{{ factory.name }}</option>
+        <select id="eyeImage" v-model="eyeImageFactoryName" @change="applySettings">
+          <option v-for="factory in eyeImageFactories" :key="factory.name" :value="factory.name">{{ factory.name }}</option>
         </select>
       </div>
       <div class="row">
@@ -131,8 +179,8 @@ onBeforeUnmount(() => {
       </div>
       <div class="row">
         <label for="exercise">Exercise:</label>
-        <select id="exercise" v-model="selectedExercise" @change="applySettings">
-          <option v-for="exercise in exerciseProviders" :key="exercise.name" :value="exercise">{{ exercise.name }}</option>
+        <select id="exercise" v-model="exerciseName" @change="applySettings">
+          <option v-for="exercise in exerciseProviders" :key="exercise.name" :value="exercise.name">{{ exercise.name }}</option>
         </select>
       </div>
     </div>

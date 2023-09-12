@@ -5,16 +5,16 @@ import {randomItem, randomSign} from "../support/Random.ts";
 
 export const exerciseProviders: ExerciseProvider[] = [
   {
+    name: 'No movement',
+    animate: noMovement,
+  },
+  {
     name: 'Convergence Massage',
     animate: convergenceMassageAnimation,
   },
   {
     name: 'Random Jumps',
     animate: randomJumpsAnimation,
-  },
-  {
-    name: 'No movement',
-    animate: noMovement,
   },
 ]
 
@@ -27,9 +27,9 @@ function noMovement(_: SidedShapes, updateCallback: () => void): Controllable {
 }
 
 function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
-  const speed = 250;
-  const moveIn = 40;
-  const moveOut = 10;
+  const speed = 200;
+  const moveIn = 5;
+  const moveOut = 5;
 
   function animateEyeMovement(image: Shape, direction: number) {
     return anime({
