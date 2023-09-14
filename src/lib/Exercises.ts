@@ -13,6 +13,10 @@ export const exerciseProviders: ExerciseProvider[] = [
     animate: convergenceMassageAnimation,
   },
   {
+    name: 'Inner muscle stretching',
+    animate: innerMuscleStretching,
+  },
+  {
     name: 'Random Jumps',
     animate: randomJumpsAnimation,
   },
@@ -39,6 +43,39 @@ function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () 
         {x: 0, duration: speed * moveOut},
         {x: moveIn * -direction, duration: speed * moveIn},
         {x: 0, duration: speed * moveIn},
+      ],
+      easing: 'linear',
+      autoplay: true,
+      loop: true,
+      update: updateCallback,
+    });
+  }
+
+  const left = animateEyeMovement(eyeImages[Side.Left], -1);
+  const right = animateEyeMovement(eyeImages[Side.Right], 1);
+
+  return {
+    pause: () => {
+      left.pause();
+      right.pause();
+    }
+  }
+}
+
+function innerMuscleStretching(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
+  const speed = 200;
+  const pauseNormal = 8000;
+  const moveOut = 20;
+  const pauseStretched = 4000;
+
+  function animateEyeMovement(image: Shape, direction: number) {
+    return anime({
+      targets: image.position,
+      keyframes: [
+        {x: 0, duration: pauseNormal},
+        {x: moveOut * direction, duration: speed * moveOut, easing: 'easeInOutCubic'},
+        {x: moveOut * direction, duration: pauseStretched},
+        {x: 0, duration: speed * moveOut, easing: 'easeInOutCubic'},
       ],
       easing: 'linear',
       autoplay: true,

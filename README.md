@@ -28,11 +28,9 @@ Latest version available at https://igormukhin.github.io/binocular-fusion-traine
 
 [x] Automatically save settings in browser's local storage
 
+[x] Exercise for inner muscle stretching
+
 [ ] Recenter images when changing window size
-
-[ ] Make eye gap dependent on resolution/screen size
-
-[ ] Exercise for stretching (inner eye muscle stretching)
 
 [ ] Add option to enable movement only for one eye
 
