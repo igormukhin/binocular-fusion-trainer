@@ -8,7 +8,7 @@ import {exerciseProviders} from "./lib/Exercises.ts";
 import {Shape} from "two.js/src/shape";
 import {loadSettings, persistSettings, Settings} from "./lib/Settings.ts";
 
-const stage = ref(null);
+const stage = ref<any>(null);
 const two = new Two({ fitted: true });
 
 const shouldDrawCentralGuide = ref(true);
@@ -140,14 +140,24 @@ function restoreSettings(settings: Settings | null) {
 }
 
 onMounted(() => {
+  window.addEventListener('resize', onWindowResize);
+  two.appendTo(stage.value);
+
   restoreSettings(loadSettings())
-  two.appendTo(stage.value!!);
   applySettings();
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', onWindowResize);
   two.clear();
 });
+
+function onWindowResize() {
+  const svg = two.renderer.domElement;
+  const parent = svg.parentElement;
+  two.renderer.setSize(parent.clientWidth, parent.clientHeight);
+  applySettings();
+}
 
 </script>
 
@@ -199,12 +209,14 @@ onBeforeUnmount(() => {
 .stage {
   height: 100%;
   flex-grow: 1;
+  overflow: hidden;
 }
 
 .control_panel {
   background-color: antiquewhite;
   height: 100%;
   padding: 0.5em;
+  width: 20em;
 
   .title {
     font-weight: bold;

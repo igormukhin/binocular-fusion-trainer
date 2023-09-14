@@ -30,7 +30,9 @@ Latest version available at https://igormukhin.github.io/binocular-fusion-traine
 
 [x] Exercise for inner muscle stretching
 
-[ ] Recenter images when changing window size
+[x] Recenter images when changing window size
+
+[ ] Adds more entertaining eye image animation (line randomly flying dot with tail)
 
 [ ] Add option to enable movement only for one eye
 
