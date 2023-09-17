@@ -40,6 +40,8 @@ Latest version available at https://igormukhin.github.io/binocular-fusion-traine
 
 [ ] Add 3D mode for red-cyan glasses (eyes in the same initial position, red-cyan colors)
 
+[ ] addk sdfkjksd fskdjf k
+
 bla bla bla confict
 
 Some changes
