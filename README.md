@@ -4,7 +4,7 @@ Latest version available at https://igormukhin.github.io/binocular-fusion-traine
 
 ## TODO
 
-[x] Draw images for both eye in correct positions
+    Draw images for both eye in correct positions
 
 [x] Animate images to move inwards and outwards
 
