@@ -177,6 +177,8 @@ function onWindowResize() {
         <input id="eyeGap" v-model="eyeGap" @change="applySettings" type="range" min="160" max="400" step="10" />
         <span>{{ eyeGap }}</span>
       </div>
+      <div class="space"/>
+
       <div class="row">
         <label for="eyeImage">Image:</label>
         <select id="eyeImage" v-model="eyeImageFactoryName" @change="applySettings">
@@ -187,11 +189,15 @@ function onWindowResize() {
         <input id="animateEyeImages" type="checkbox" v-model="shouldAnimateEyeImages" @change="applySettings">
         <label for="animateEyeImages" class="checkbox">Animate images</label>
       </div>
+
+      <div class="space"/>
       <div class="row">
-        <label for="exercise">Exercise:</label>
-        <select id="exercise" v-model="exerciseName" @change="applySettings">
-          <option v-for="exercise in exerciseProviders" :key="exercise.name" :value="exercise.name">{{ exercise.name }}</option>
-        </select>
+        <div>Exercise:</div>
+
+        <div v-for="(exercise, index) in exerciseProviders" :key="exercise.name">
+          <input :id="'exercise_' + index" type="radio" name="exercise" v-model="exerciseName" :value="exercise.name" @change="applySettings">
+          <label :for="'exercise_' + index">{{ exercise.name }}</label>
+        </div>
       </div>
     </div>
   </div>
@@ -229,6 +235,10 @@ function onWindowResize() {
     label {
       margin-right: 0.5em;
     }
+  }
+
+  .space {
+    height: 1em;
   }
 }
 

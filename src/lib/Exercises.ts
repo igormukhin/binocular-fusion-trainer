@@ -9,12 +9,12 @@ export const exerciseProviders: ExerciseProvider[] = [
     animate: noMovement,
   },
   {
-    name: 'Convergence Massage',
-    animate: convergenceMassageAnimation,
-  },
-  {
     name: 'Inner muscle stretching',
     animate: innerMuscleStretching,
+  },
+  {
+    name: 'Convergence Massage',
+    animate: convergenceMassageAnimation,
   },
   {
     name: 'Random Jumps',
