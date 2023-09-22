@@ -1,9 +1,10 @@
-import {EyeImageProvider, Side, SidedShapes} from "./Common.ts";
+import {EyeImageProvider, EyeImages, Side, SidedShapes} from "./Common.ts";
 import Two from "two.js";
+import anime from "animejs/lib/anime.es";
 
 export const eyeImageFactories: EyeImageProvider[] = [
   {
-    name: "Circle",
+    name: "Animated Circle",
     make: makeCircles
   },
   {
@@ -16,7 +17,7 @@ export const eyeImageFactories: EyeImageProvider[] = [
   }
 ]
 
-function makeCircles(two: Two): SidedShapes {
+function makeCircles(two: Two): EyeImages {
   function makeEyeImage() {
     const radius = 32;
     const linewidth = 3;
@@ -36,13 +37,28 @@ function makeCircles(two: Two): SidedShapes {
     return group;
   }
 
-  return {
+  const images: SidedShapes = {
     [Side.Left]: makeEyeImage(),
     [Side.Right]: makeEyeImage(),
   }
+
+  const animation = anime({
+    targets: Object.values(images),
+    rotation: Math.PI * 2,
+    duration: 20000,
+    easing: 'linear',
+    autoplay: true,
+    loop: true,
+    update: () => two.update(),
+  });
+
+  return {
+    images,
+    pause: () => animation.pause(),
+  }
 }
 
-function makeSemiDisconnectedBrackets(two: Two): SidedShapes {
+function makeSemiDisconnectedBrackets(two: Two): EyeImages {
   function makeEyeImage(side: Side) {
     const size = 64;
     const innerCircleRadius = 8;
@@ -65,12 +81,15 @@ function makeSemiDisconnectedBrackets(two: Two): SidedShapes {
   }
 
   return {
-    [Side.Left]: makeEyeImage(Side.Left),
-    [Side.Right]: makeEyeImage(Side.Right),
+    images: {
+      [Side.Left]: makeEyeImage(Side.Left),
+      [Side.Right]: makeEyeImage(Side.Right),
+    },
+    pause: () => {}
   }
 }
 
-function makeDisconnectedCross(two: Two): SidedShapes {
+function makeDisconnectedCross(two: Two): EyeImages {
   const length = 80;
   const thickness = 8;
 
@@ -93,7 +112,10 @@ function makeDisconnectedCross(two: Two): SidedShapes {
   }
 
   return {
-    [Side.Left]: makeHorizontalLine(),
-    [Side.Right]: makeVerticalLine(),
+    images: {
+      [Side.Left]: makeHorizontalLine(),
+      [Side.Right]: makeVerticalLine(),
+    },
+    pause: () => {},
   }
 }

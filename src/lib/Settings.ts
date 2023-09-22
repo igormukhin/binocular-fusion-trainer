@@ -2,7 +2,6 @@ export interface Settings {
     shouldDrawCentralGuide: boolean;
     eyeGap: number;
     eyeImageFactoryName: string;
-    shouldAnimateEyeImages: boolean;
     exerciseName: string;
 }
 

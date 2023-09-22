@@ -10,16 +10,20 @@ export type SidedShapes = {
   [key in Side]: Shape;
 }
 
+export interface Controllable {
+  pause: () => void;
+}
+
+export interface EyeImages extends Controllable {
+  images: SidedShapes;
+}
+
 export interface EyeImageProvider {
   name: string;
-  make: (two: Two) => SidedShapes;
+  make: (two: Two) => EyeImages;
 }
 
 export interface ExerciseProvider {
   name: string;
   animate: (eyeImages: SidedShapes, updateCallback: () => void) => Controllable;
-}
-
-export interface Controllable {
-  pause: () => void;
 }

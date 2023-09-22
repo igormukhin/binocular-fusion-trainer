@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import Two from 'two.js';
-import anime from 'animejs/lib/anime.es.js';
-import {Controllable, Side, SidedShapes} from "./lib/Common.ts";
+import {Controllable, EyeImages, Side, SidedShapes} from "./lib/Common.ts";
 import {eyeImageFactories} from "./lib/EyeImages.ts";
 import {exerciseProviders} from "./lib/Exercises.ts";
 import {Shape} from "two.js/src/shape";
@@ -18,11 +17,8 @@ const eyeGap = ref(320);
 
 const eyeImageFactoryName = ref(eyeImageFactories[0].name);
 const eyeImageFactory = computed(() => eyeImageFactories.find(factory => factory.name === eyeImageFactoryName.value)!!);
-let eyeImages: SidedShapes;
+let eyeImages: EyeImages;
 let eyeImagePlaceholders: SidedShapes;
-
-const shouldAnimateEyeImages = ref(true);
-let currentEyeImageAnimation: Controllable;
 
 const exerciseName = ref(exerciseProviders[0].name);
 const exercise = computed(() => exerciseProviders.find(exercise => exercise.name === exerciseName.value)!!);
@@ -46,7 +42,8 @@ function applySceneBackground() {
 
 function applyEyeImages() {
   if (eyeImages) {
-    Object.values(eyeImages).forEach(eyeImage => eyeImage.remove());
+    eyeImages.pause();
+    Object.values(eyeImages.images).forEach(img => img.remove());
   }
 
   eyeImages = eyeImageFactory.value.make(two);
@@ -58,30 +55,12 @@ function applyEyeImagePositions() {
   }
 
   eyeImagePlaceholders = {
-    [Side.Left]: two.makeGroup(eyeImages[Side.Left]),
-    [Side.Right]: two.makeGroup(eyeImages[Side.Right]),
+    [Side.Left]: two.makeGroup(eyeImages.images[Side.Left]),
+    [Side.Right]: two.makeGroup(eyeImages.images[Side.Right]),
   }
 
   eyeImagePlaceholders[Side.Left].position.set(two.width / 2 - (eyeGap.value / 2), two.height / 2);
   eyeImagePlaceholders[Side.Right].position.set(two.width / 2 + (eyeGap.value / 2), two.height / 2);
-}
-
-function applyEyeImageAnimation() {
-  if (currentEyeImageAnimation) {
-    currentEyeImageAnimation.pause();
-  }
-
-  if (shouldAnimateEyeImages.value) {
-    currentEyeImageAnimation = anime({
-      targets: Object.values(eyeImages),
-      rotation: Math.PI * 2,
-      duration: 20000,
-      easing: 'linear',
-      autoplay: true,
-      loop: true,
-      update: () => two.update(),
-    });
-  }
 }
 
 function applyExerciseAnimation() {
@@ -89,24 +68,22 @@ function applyExerciseAnimation() {
     currentExerciseAnimation.pause();
   }
 
-  currentExerciseAnimation = exercise.value.animate(eyeImages, () => two.update());
+  currentExerciseAnimation = exercise.value.animate(eyeImages.images, () => two.update());
 }
 
 function applySettings() {
   applySceneBackground();
   applyEyeImages();
   applyEyeImagePositions();
-  applyEyeImageAnimation();
   applyExerciseAnimation();
   persistSettings(snapshotSettings());
 }
 
-function snapshotSettings() {
+function snapshotSettings(): Settings {
   return {
     shouldDrawCentralGuide: shouldDrawCentralGuide.value,
     eyeGap: eyeGap.value,
     eyeImageFactoryName: eyeImageFactoryName.value,
-    shouldAnimateEyeImages: shouldAnimateEyeImages.value,
     exerciseName: exerciseName.value,
   };
 }
@@ -127,10 +104,6 @@ function restoreSettings(settings: Settings | null) {
   if (settings.eyeImageFactoryName != null
       && eyeImageFactories.find(factory => factory.name === settings.eyeImageFactoryName) != null) {
     eyeImageFactoryName.value = settings.eyeImageFactoryName;
-  }
-
-  if (settings.shouldAnimateEyeImages != null) {
-    shouldAnimateEyeImages.value = settings.shouldAnimateEyeImages;
   }
 
   if (settings.exerciseName != null
@@ -169,25 +142,9 @@ function onWindowResize() {
       <div class="title">Binocular Fusion Trainer</div>
 
       <div class="row">
-        <input id="centralGuide" type="checkbox" v-model="shouldDrawCentralGuide" @change="applySettings">
-        <label for="centralGuide" class="checkbox">Central guide</label>
-      </div>
-      <div class="row">
         <label for="eyeGap">Eye gap:</label>
         <input id="eyeGap" v-model="eyeGap" @change="applySettings" type="range" min="160" max="400" step="10" />
         <span>{{ eyeGap }}</span>
-      </div>
-      <div class="space"/>
-
-      <div class="row">
-        <label for="eyeImage">Image:</label>
-        <select id="eyeImage" v-model="eyeImageFactoryName" @change="applySettings">
-          <option v-for="factory in eyeImageFactories" :key="factory.name" :value="factory.name">{{ factory.name }}</option>
-        </select>
-      </div>
-      <div class="row">
-        <input id="animateEyeImages" type="checkbox" v-model="shouldAnimateEyeImages" @change="applySettings">
-        <label for="animateEyeImages" class="checkbox">Animate images</label>
       </div>
 
       <div class="space"/>
@@ -198,6 +155,20 @@ function onWindowResize() {
           <input :id="'exercise_' + index" type="radio" name="exercise" v-model="exerciseName" :value="exercise.name" @change="applySettings">
           <label :for="'exercise_' + index">{{ exercise.name }}</label>
         </div>
+      </div>
+      <div class="space"/>
+
+      <div class="row">
+        <label for="eyeImage">Image:</label>
+        <select id="eyeImage" v-model="eyeImageFactoryName" @change="applySettings">
+          <option v-for="factory in eyeImageFactories" :key="factory.name" :value="factory.name">{{ factory.name }}</option>
+        </select>
+      </div>
+      <div class="space"/>
+
+      <div class="row">
+        <input id="centralGuide" type="checkbox" v-model="shouldDrawCentralGuide" @change="applySettings">
+        <label for="centralGuide" class="checkbox">Central guide</label>
       </div>
     </div>
   </div>

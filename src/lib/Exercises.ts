@@ -64,9 +64,9 @@ function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () 
 
 function innerMuscleStretching(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
   const speed = 200;
-  const pauseNormal = 8000;
+  const pauseNormal = 10000;
   const moveOut = 20;
-  const pauseStretched = 4000;
+  const pauseStretched = 2000;
 
   function animateEyeMovement(image: Shape, direction: number) {
     return anime({
