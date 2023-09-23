@@ -24,6 +24,25 @@ const exerciseName = ref(exerciseProviders[0].name);
 const exercise = computed(() => exerciseProviders.find(exercise => exercise.name === exerciseName.value)!!);
 let currentExerciseAnimation: Controllable;
 
+let elapsedInterval: number;
+const elapsedSeconds = ref(0);
+const elapsedTimeFormatted = computed(() => {
+  const minutes = Math.floor(elapsedSeconds.value / 60);
+  const seconds = elapsedSeconds.value % 60;
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+});
+
+function applyTimer() {
+  if (elapsedInterval) {
+    clearInterval(elapsedInterval);
+  }
+
+  elapsedSeconds.value = 0;
+  elapsedInterval = setInterval(() => {
+    elapsedSeconds.value++;
+  }, 1000);
+}
+
 function applySceneBackground() {
   if (sceneBackground) {
     sceneBackground.remove();
@@ -72,6 +91,7 @@ function applyExerciseAnimation() {
 }
 
 function applySettings() {
+  applyTimer();
   applySceneBackground();
   applyEyeImages();
   applyEyeImagePositions();
@@ -170,6 +190,12 @@ function onWindowResize() {
         <input id="centralGuide" type="checkbox" v-model="shouldDrawCentralGuide" @change="applySettings">
         <label for="centralGuide" class="checkbox">Central guide</label>
       </div>
+      <div class="space"/>
+
+      <div class="row">
+        <span>Time elapsed: {{ elapsedTimeFormatted }}</span>
+      </div>
+
     </div>
   </div>
 </template>
