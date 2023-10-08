@@ -3,6 +3,9 @@ export interface Settings {
     eyeGap: number;
     eyeImageFactoryName: string;
     exerciseName: string;
+    innerMuscleStretching: {
+        moveOut: number;
+    };
 }
 
 export function persistSettings(settings: Settings) {

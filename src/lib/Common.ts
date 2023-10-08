@@ -1,5 +1,6 @@
 import {Shape} from "two.js/src/shape";
 import Two from "two.js";
+import {Settings} from "./Settings.ts";
 
 export enum Side {
   Left,
@@ -25,5 +26,5 @@ export interface EyeImageProvider {
 
 export interface ExerciseProvider {
   name: string;
-  animate: (eyeImages: SidedShapes, updateCallback: () => void) => Controllable;
+  animate: (eyeImages: SidedShapes, updateCallback: () => void, settings: Settings) => Controllable;
 }

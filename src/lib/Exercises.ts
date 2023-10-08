@@ -2,6 +2,9 @@ import {Controllable, ExerciseProvider, Side, SidedShapes} from "./Common.ts";
 import {Shape} from "two.js/src/shape";
 import anime from "animejs/lib/anime.es.js";
 import {randomItem, randomSign} from "../support/Random.ts";
+import {Settings} from "./Settings.ts";
+
+export const INNER_MUSCLE_STRETCHING = 'Inner muscle stretching';
 
 export const exerciseProviders: ExerciseProvider[] = [
   {
@@ -62,10 +65,10 @@ function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () 
   }
 }
 
-function innerMuscleStretching(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
-  const speed = 200;
+function innerMuscleStretching(eyeImages: SidedShapes, updateCallback: () => void, settings: Settings): Controllable {
   const pauseNormal = 10000;
-  const moveOut = 20;
+  const speed = 200;
+  const moveOut = settings.innerMuscleStretching?.moveOut ?? 20;
   const pauseStretched = 2000;
 
   function animateEyeMovement(image: Shape, direction: number) {

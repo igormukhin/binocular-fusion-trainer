@@ -3,7 +3,7 @@ import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import Two from 'two.js';
 import {Controllable, EyeImages, Side, SidedShapes} from "./lib/Common.ts";
 import {eyeImageFactories} from "./lib/EyeImages.ts";
-import {exerciseProviders} from "./lib/Exercises.ts";
+import {exerciseProviders, INNER_MUSCLE_STRETCHING} from "./lib/Exercises.ts";
 import {Shape} from "two.js/src/shape";
 import {loadSettings, persistSettings, Settings} from "./lib/Settings.ts";
 import {formatMinSecs, SecondsTicker} from "./lib/SecondsTicker.ts";
@@ -27,6 +27,8 @@ let currentExerciseAnimation: Controllable;
 
 const elapsedSeconds = ref(0);
 const secondsTicker = SecondsTicker.forRef(elapsedSeconds);
+
+const imsMoveOut = ref(20);
 
 function applySceneBackground() {
   if (sceneBackground) {
@@ -72,7 +74,8 @@ function applyExerciseAnimation() {
     currentExerciseAnimation.pause();
   }
 
-  currentExerciseAnimation = exercise.value.animate(eyeImages.images, () => two.update());
+  currentExerciseAnimation = exercise.value.animate(
+      eyeImages.images, () => two.update(), snapshotSettings());
 }
 
 function applySettings() {
@@ -89,6 +92,9 @@ function snapshotSettings(): Settings {
     eyeGap: eyeGap.value,
     eyeImageFactoryName: eyeImageFactoryName.value,
     exerciseName: exerciseName.value,
+    innerMuscleStretching: {
+      moveOut: imsMoveOut.value,
+    },
   };
 }
 
@@ -114,6 +120,8 @@ function restoreSettings(settings: Settings | null) {
       && exerciseProviders.find(exercise => exercise.name === settings.exerciseName) != null) {
     exerciseName.value = settings.exerciseName;
   }
+
+  imsMoveOut.value = settings.innerMuscleStretching?.moveOut ?? imsMoveOut.value;
 }
 
 onMounted(() => {
@@ -161,8 +169,17 @@ function onWindowResize() {
           <label :for="'exercise_' + index">{{ exercise.name }}</label>
         </div>
       </div>
-      <div class="space"/>
 
+      <div v-if="exerciseName == INNER_MUSCLE_STRETCHING">
+        <div class="space"/>
+        <div class="row">
+          <label for="imsMoveOut">Outwards stretching distance:</label>
+          <input id="imsMoveOut" v-model="imsMoveOut" @change="applySettings" type="range" min="10" max="60" step="5" />
+          <span>{{ imsMoveOut }}</span>
+        </div>
+      </div>
+
+      <div class="space"/>
       <div class="row">
         <label for="eyeImage">Image:</label>
         <select id="eyeImage" v-model="eyeImageFactoryName" @change="applySettings">
