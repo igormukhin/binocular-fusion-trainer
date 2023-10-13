@@ -5,6 +5,7 @@ import {randomItem, randomSign} from "../support/Random.ts";
 import {Settings} from "./Settings.ts";
 
 export const INNER_MUSCLE_STRETCHING = 'Inner muscle stretching';
+export const CONVERGENCE_MASSAGE = 'Convergence Massage';
 
 export const exerciseProviders: ExerciseProvider[] = [
   {
@@ -33,19 +34,20 @@ function noMovement(_: SidedShapes, updateCallback: () => void): Controllable {
   }
 }
 
-function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () => void): Controllable {
+function convergenceMassageAnimation(eyeImages: SidedShapes, updateCallback: () => void, settings: Settings): Controllable {
+  const pauseNormal = 0;
   const speed = 200;
-  const moveIn = 5;
-  const moveOut = 5;
+  const moveOut = settings.convergenceMassage?.moveOut ?? 10;
+  const pauseStretched = 0;
 
   function animateEyeMovement(image: Shape, direction: number) {
     return anime({
       targets: image.position,
       keyframes: [
+        {x: 0, duration: pauseNormal},
         {x: moveOut * direction, duration: speed * moveOut},
+        {x: moveOut * direction, duration: pauseStretched},
         {x: 0, duration: speed * moveOut},
-        {x: moveIn * -direction, duration: speed * moveIn},
-        {x: 0, duration: speed * moveIn},
       ],
       easing: 'linear',
       autoplay: true,

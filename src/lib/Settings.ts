@@ -6,6 +6,9 @@ export interface Settings {
     innerMuscleStretching: {
         moveOut: number;
     };
+    convergenceMassage: {
+        moveOut: number;
+    }
 }
 
 export function persistSettings(settings: Settings) {

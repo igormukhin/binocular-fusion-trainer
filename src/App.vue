@@ -3,7 +3,7 @@ import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import Two from 'two.js';
 import {Controllable, EyeImages, Side, SidedShapes} from "./lib/Common.ts";
 import {eyeImageFactories} from "./lib/EyeImages.ts";
-import {exerciseProviders, INNER_MUSCLE_STRETCHING} from "./lib/Exercises.ts";
+import {CONVERGENCE_MASSAGE, exerciseProviders, INNER_MUSCLE_STRETCHING} from "./lib/Exercises.ts";
 import {Shape} from "two.js/src/shape";
 import {loadSettings, persistSettings, Settings} from "./lib/Settings.ts";
 import {formatMinSecs, SecondsTicker} from "./lib/SecondsTicker.ts";
@@ -29,6 +29,7 @@ const elapsedSeconds = ref(0);
 const secondsTicker = SecondsTicker.forRef(elapsedSeconds);
 
 const imsMoveOut = ref(20);
+const conmasMoveOut = ref(10);
 
 function applySceneBackground() {
   if (sceneBackground) {
@@ -95,6 +96,9 @@ function snapshotSettings(): Settings {
     innerMuscleStretching: {
       moveOut: imsMoveOut.value,
     },
+    convergenceMassage: {
+      moveOut: conmasMoveOut.value,
+    },
   };
 }
 
@@ -122,6 +126,7 @@ function restoreSettings(settings: Settings | null) {
   }
 
   imsMoveOut.value = settings.innerMuscleStretching?.moveOut ?? imsMoveOut.value;
+  conmasMoveOut.value = settings.convergenceMassage?.moveOut ?? conmasMoveOut.value;
 }
 
 onMounted(() => {
@@ -142,6 +147,11 @@ function onWindowResize() {
   const svg = two.renderer.domElement;
   const parent = svg.parentElement;
   two.renderer.setSize(parent.clientWidth, parent.clientHeight);
+  applySettings();
+}
+
+function resetClock() {
+  secondsTicker.restart();
   applySettings();
 }
 
@@ -173,9 +183,18 @@ function onWindowResize() {
       <div v-if="exerciseName == INNER_MUSCLE_STRETCHING">
         <div class="space"/>
         <div class="row">
-          <label for="imsMoveOut">Outwards stretching distance:</label>
+          <label for="imsMoveOut">Stretching distance:</label>
           <input id="imsMoveOut" v-model="imsMoveOut" @change="applySettings" type="range" min="10" max="60" step="5" />
           <span>{{ imsMoveOut }}</span>
+        </div>
+      </div>
+
+      <div v-if="exerciseName == CONVERGENCE_MASSAGE">
+        <div class="space"/>
+        <div class="row">
+          <label for="imsMoveOut">Stretching distance:</label>
+          <input id="imsMoveOut" v-model="conmasMoveOut" @change="applySettings" type="range" min="5" max="100" step="5" />
+          <span>{{ conmasMoveOut }}</span>
         </div>
       </div>
 
@@ -195,7 +214,7 @@ function onWindowResize() {
       <div class="space"/>
 
       <div class="row">
-        Time elapsed: {{ formatMinSecs(elapsedSeconds) }} <button v-on:click="secondsTicker.restart()">&#8634;</button>
+        Time elapsed: {{ formatMinSecs(elapsedSeconds) }} <button v-on:click="resetClock();">&#8634;</button>
       </div>
 
     </div>
